@@ -12,23 +12,41 @@ fi
 # ...
 inputFileList_path="$1"
 
-# Path to root directory with raw Sentinel-1 zip files
-dir_root="/mnt/d/data_2/raw_root/temp/"
+# Path to root directory with raw Sentinel-1 zip files: default arg 
+dir_root="/mnt/d/data_2/raw_root/pituffik/"
 
-# Path to directory for output tifs
-dir_output="/mnt/d/data_2/output/temp"
+# Path to directory for output tifs: default arg 
+dir_output="/mnt/d/data_2/output/pituffik_20_21/"
 
-# Path to the xml file for the SNAP graph processing tool (gpt)
-file_graph="/home/mtontsch/DeepSeepNetRepo/preprocessing_pipelines/xml/ORB_BN_TN_CAL_SPCK_TC_Subset_LSMask.xml"
+# Path to the xml file for the SNAP graph processing tool (gpt): option with vs. without land-sea-mask
+# file_graph="/home/mtontsch/DeepSeepNet/preprocessing_pipelines/xml/ORB_BN_TN_CAL_SPCK_TC_Subset_LSMask.xml"
+file_graph="/home/mtontsch/DeepSeepNet/preprocessing_pipelines/xml/ORB_BN_TN_CAL_SPCK_TC_Subset.xml"
+
+# Path to shapefile for SNAPS's land-sea-mask operator: use if necessary
+file_landmask="/home/mtontsch/DeepSeepNet/data/shapefiles/osm_buffered_diskobay/osm_land_polygons_buffered_40m_8px.shp"
+
+# Option: Set utm zone and define subset as WKT polygon
+# Disko Bay:
+# wkt_polyon="POLYGON((-54.014 68.5991,-51.194 68.5991,-51.194 69.4841,-54.014 69.4841,-54.014 68.5991))"
+# Pituffik Space Base:
+utm_zone="19"
+central_meridian="-69.0" # for UTM zone 19
+wkt_polyon="POLYGON(( \
+                    -72.290654 76.868834,\
+                    -66.439580 76.877091,\
+                    -66.570601 76.155830,\
+                    -72.122401 76.148019,\
+                    -72.290654 76.868834\
+                    ))"
+
+# For S1_EW_GRDM_1SDH data products:
+pixelSpacingInMeter="40.0"
+pixelSpacingInDegree="3.593261136478086E-4" 
+# For 
+
+# For later use
 name_graph=$(basename "$file_graph" | cut -d. -f1)
-
-# Path to shapefile for SNAPS's land-sea-mask operator
-file_landmask="/home/mtontsch/DeepSeepNet/data/osm_land_polygons_buffered_40m_5px/osm_land_polygons_buffered_40m_5px.shp"
 name_landmask=$(basename "$file_landmask" | cut -d. -f1)
-
-
-# Define the WKT polygon for SNAP's subset operator
-wkt_polyon="POLYGON((-71.395 71.032, -68.645 71.032, -68.645 71.912, -71.395 71.912, -71.395 71.032))"
 
 
 # Start time of the script and counter for the scenes
@@ -55,14 +73,22 @@ while IFS= read -r file_zip_name; do
         -Psource="$file_zip" \
         -Ptarget="$path_outputFileSnap" \
         -PgeoRegion="$wkt_polyon" \
-        -PutmZone="19" \
+        -PutmZone="$utm_zone" \
+        -Pcentral_meridian="$central_meridian" \
+        -PpixelSpacingInMeter="$pixelSpacingInMeter" \
+        -PpixelSpacingInDegree="$pixelSpacingInDegree" \
         -Plandmask_path="$file_landmask" \
-        -Plandmask_name="$name_landmask" \
+        -Plandmask_name="$name_landmask"
 
     echo ""
     # Convert to NaN Values and dB ##
     python convert_to_NaN_and_dB.py "$path_outputFileSnap"
     echo ""
+    # check if following script is executed correctly, if not exit and print error message
+    if [ $? -ne 0 ]; then
+        echo "Error: convert_to_NaN_and_dB.py failed for $name_scene"
+        exit 1
+    fi
 
 
     echo "Done processing scene $name_scene"

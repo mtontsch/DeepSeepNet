@@ -110,7 +110,7 @@
           AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
           AXIS[&quot;Geodetic latitude&quot;, NORTH]], &#xd;
         PROJECTION[&quot;Transverse_Mercator&quot;], &#xd;
-        PARAMETER[&quot;central_meridian&quot;, -69.0], &#xd;
+        PARAMETER[&quot;central_meridian&quot;, ${central_meridian}], &#xd;
         PARAMETER[&quot;latitude_of_origin&quot;, 0.0], &#xd;
         PARAMETER[&quot;scale_factor&quot;, 0.9996], &#xd;
         PARAMETER[&quot;false_easting&quot;, 500000.0], &#xd;
