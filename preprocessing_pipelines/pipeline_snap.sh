@@ -12,25 +12,23 @@ fi
 # ...
 inputFileList_path="$1"
 
-# Path to root directory with raw zip files
-dir_root="/mnt/d/data_2/raw_root_scott_2025/"
+# Path to root directory with raw Sentinel-1 zip files
+dir_root="/mnt/d/data_2/raw_root/temp/"
 
 # Path to directory for output tifs
-dir_output="/mnt/d/data_2/output_wide/"
+dir_output="/mnt/d/data_2/output/temp"
 
-# Path to snap xml graph
-# file_graph="/home/mtontsch/DeepSeepNetRepo/preprocessing_pipelines/xml/ORB_BN_TN_CAL_SPCK_TC_Subset.xml"
+# Path to the xml file for the SNAP graph processing tool (gpt)
 file_graph="/home/mtontsch/DeepSeepNetRepo/preprocessing_pipelines/xml/ORB_BN_TN_CAL_SPCK_TC_Subset_LSMask.xml"
 name_graph=$(basename "$file_graph" | cut -d. -f1)
 
-# file_landmask="/mnt/f/ArcticDeepSeepsData/shapefiles/shapefiles_regional/osm_scott_buffered/ScottTrough_5px.shp"
-file_landmask="/mnt/f/ArcticDeepSeepsData/temp/land_polygons_buffered_40m_5px_wide/land_polygons_buffered_40m_5px.shp"
+# Path to shapefile for SNAPS's land-sea-mask operator
+file_landmask="/home/mtontsch/DeepSeepNet/data/osm_land_polygons_buffered_40m_5px/osm_land_polygons_buffered_40m_5px.shp"
 name_landmask=$(basename "$file_landmask" | cut -d. -f1)
 
 
-
+# Define the WKT polygon for SNAP's subset operator
 wkt_polyon="POLYGON((-71.395 71.032, -68.645 71.032, -68.645 71.912, -71.395 71.912, -71.395 71.032))"
-
 
 
 # Start time of the script and counter for the scenes

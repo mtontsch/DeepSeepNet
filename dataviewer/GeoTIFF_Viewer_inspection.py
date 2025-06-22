@@ -1,12 +1,8 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 from matplotlib.widgets import Slider
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from osgeo import gdal
-import utm
-import csv
 import cmocean
 
 gdal.UseExceptions()
@@ -64,6 +60,8 @@ class GeoTIFFViewer:
             file.write(self.current_scenename + '\n')
 
     def toggle_limits(self):
+
+        # Toggle between minmax and sigma clipping
         if self.sigma_level in [1, 2, 3]:
             upper = [84.135, 97.725, 99.865]
             lower = [15.865, 2.275, 0.135]
@@ -82,8 +80,6 @@ class GeoTIFFViewer:
             self.vmax_HH = -1.4
             self.vmin_HV = -47.6
             self.vmax_HV = -16.7
-            # 'HH': (-38.4, -1.4),
-            # 'HV': (-47.6, -16.7),
 
     def update(self, val):  
         self.current_file_index = int(val)
@@ -102,15 +98,15 @@ class GeoTIFFViewer:
         self.subset_1 = dataset_1.GetRasterBand(1).ReadAsArray().astype(float)  
         self.subset_2 = dataset_1.GetRasterBand(2).ReadAsArray().astype(float) 
 
-        # if more than 2 channels
+        # If incidence channel is present
         if dataset_1.RasterCount > 2:
             self.subset_3 = dataset_1.GetRasterBand(3).ReadAsArray().astype(float)
             # mean of third channel
             self.mean_inc_angle = np.nanmean(self.subset_3)
 
-        # print number of nan values in subset_1
-        print(f'Number of nan values in subset_1: {np.sum(np.isnan(self.subset_1))}')
-        
+        # print(f'Number of nan values in subset_1: {np.sum(np.isnan(self.subset_1))}')
+
+
         # self.subset_1 = 20 * np.log10(self.subset_1)
         # self.subset_2 = 20 * np.log10(self.subset_2)
         # self.subset_1 = np.where(np.isnan(self.subset_1), np.nan, 10 * np.log10(self.subset_1))
@@ -152,7 +148,7 @@ class GeoTIFFViewer:
         
         # Display title
         date, time, sat = self.get_date_and_sat_from_filename(self.file_list[self.current_file_index])
-        print(self.file_list[self.current_file_index])
+        print(f"Current image: {self.file_list[self.current_file_index]}")
         print("----------------------------------------------")
         suptitle = f'{sat} | {date} | {time} '
         if hasattr(self, 'mean_inc_angle'):
@@ -160,20 +156,20 @@ class GeoTIFFViewer:
         self.fig.suptitle(suptitle, fontsize=16)
         
         # Display subplottitle
+
+
         titles = {
-            3: '(3 sigma clipped)',
-            2: '(2 sigma clipped)',
-            1: '(1 sigma clipped)',
-            4: '(manual limits)'
+            3: f'(3 sigma clipped [{self.vmin_HH:.1f}, {self.vmax_HH:.1f}])',
+            2: f'(2 sigma clipped [{self.vmin_HH:.1f}, {self.vmax_HH:.1f}])',
+            1: f'(1 sigma clipped [{self.vmin_HH:.1f}, {self.vmax_HH:.1f}])',
+            4: f'(manual limits [{self.vmin_HH:.1f}, {self.vmax_HH:.1f}])'
         }
         self.ax[0].set_title(f'HH {titles[self.sigma_level]}')
         self.ax[1].set_title(f'HV {titles[self.sigma_level]}')
 
 
     def get_date_and_sat_from_filename(self, file_name):
-        # extracts date, time and satellite from filename   
-
-        # file_name = file_name[7:]
+        
         # OG S1 name scheme
         date_part = file_name[17:25]
         time_part = file_name[26:32]
@@ -190,6 +186,8 @@ class GeoTIFFViewer:
             sat = 'Sentinel-1A'
         elif sat_part == 'S1B':
             sat = 'Sentinel-1B'
+        elif sat_part == 'S1C':
+            sat = 'Sentinel-1C'
         else:
             sat = 'Code and filenames dont match!'
         return date, time, sat
@@ -197,13 +195,8 @@ class GeoTIFFViewer:
 
 if __name__ == '__main__':
     
-    # F:\PolarRS\dataset_6\geotiffs_1024
     directory = '/mnt/f/PolarRS/dataset_6/geotiffs_1024'
-    directory = '/mnt/d/data_2/output/'
-    # directory = '/mnt/f/ArcticDeepSeepsData/S1B_EW_GRDM_1SDH_20180219T071944_20180219T072044_009689_0117A5_9CE5/'
-    
-    
-
+    directory = '/mnt/d/data_2/output_scott_2025/'
 
     viewer = GeoTIFFViewer(directory)
 
