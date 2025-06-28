@@ -98,8 +98,8 @@
       <externalDEMApplyEGM>true</externalDEMApplyEGM>
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
-      <pixelSpacingInMeter>40.0</pixelSpacingInMeter>
-      <pixelSpacingInDegree>3.593261136478086E-4</pixelSpacingInDegree>
+      <pixelSpacingInMeter>${pixelSpacingInMeter}</pixelSpacingInMeter>
+      <pixelSpacingInDegree>${pixelSpacingInDegree}</pixelSpacingInDegree>
       <mapProjection>PROJCS[&quot;UTM Zone ${utmZone} / World Geodetic System 1984&quot;, &#xd;
         GEOGCS[&quot;World Geodetic System 1984&quot;, &#xd;
           DATUM[&quot;World Geodetic System 1984&quot;, &#xd;

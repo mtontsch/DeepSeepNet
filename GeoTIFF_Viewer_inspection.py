@@ -213,8 +213,8 @@ class GeoTIFFViewer:
 
 
 if __name__ == '__main__':
-    dir_path = '/mnt/d/data_2/output/pituffik_20_21/geotiffs_padded_subset_base/'
-    # dir_path = '/mnt/d/data_2/output/pituffik_20_21/geotiffs/'
+    # dir_path = '/mnt/d/data_2/output/pituffik_20_21/geotiffs_padded_subset_base/'
+    dir_path = '/mnt/d/data_2/output/pituffik_20_21_IW/'
 
     viewer = GeoTIFFViewer(dir_path)
     plt.subplots_adjust(

@@ -4,6 +4,8 @@ import sys
 import os
 import numpy as np
 from osgeo import gdal
+
+gdal.PushErrorHandler('CPLQuietErrorHandler') # ignores gdal warning: Sum of Photometric type-related color channels and ExtraSamples doesn't match SamplesPerPixel
 gdal.UseExceptions()
 
 
@@ -30,12 +32,14 @@ def convert_to_NaN_and_dB(input_file):
 
     # Create the output dataset
     driver = gdal.GetDriverByName('GTiff')
+    options = ['PHOTOMETRIC=MINISBLACK', 'TILED=YES', 'COMPRESS=LZW']
     out_ds = driver.Create(
         output_file,
         xsize,
         ysize,
         band_count,
-        gdal.GDT_Float32
+        gdal.GDT_Float32,
+        options
     )
 
     if out_ds is None:
@@ -64,18 +68,15 @@ def convert_to_NaN_and_dB(input_file):
         # Write data to output band
         out_band = out_ds.GetRasterBand(band_number)
         out_band.WriteArray(data)
-        out_band.FlushCache()
-
-        # Optionally set NoData value
+        out_band.SetColorInterpretation(gdal.GCI_GrayIndex)
         out_band.SetNoDataValue(np.nan)
+        out_band.FlushCache()
 
         print(f"Processed band {band_number}")
 
     # Close datasets
     ds = None
     out_ds = None
-
-    print(f"Converted file saved as {output_file}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
